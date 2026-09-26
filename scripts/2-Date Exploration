@@ -1,0 +1,27 @@
+/*
+=====================================================================================
+Date Exploration
+=====================================================================================
+Purpose:
+    - This report finds dates of first and last orders
+    - Month range of sales
+    - Gives information about customers ages
+
+=====================================================================================
+*/
+
+--find the date of first and last orders
+-- how many years of sales are avliable
+select 
+max(order_date) first_order,
+min(order_date) last_order,
+datediff(month, min(order_date),max(order_date)) as order_range_months
+from gold.fact_sales
+
+--find the youngest and oldest customers
+select 
+min(birthday) as youngest_birthdate,
+max(birthday) as oldest_birthdate,
+datediff(year,min(birthday),getdate()) as oldest_customer_age,
+datediff(year,max(birthday),getdate()) as youngest_customer_age
+from gold.dim_customers
