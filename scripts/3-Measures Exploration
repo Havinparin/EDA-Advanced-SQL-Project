@@ -1,0 +1,45 @@
+/*
+=====================================================================================
+Measure Exploration
+=====================================================================================
+
+Script Purpose:
+    - Calculate key business measures from the sales, product, and customer data.
+    - Determine total sales and total quantity sold.
+    - Calculate the average selling price.
+    - Count the total number of orders, products, and customers.
+    - Provide a high-level overview of the business performance.
+=====================================================================================
+*/
+--find the total sales
+select 'Total Sales' as measure_name,sum(sales_amount) Amount from gold.fact_sales
+
+ union all
+
+--find how many items are sold
+select 'number of sold items' as measure_name,sum(quantity)  from gold.fact_sales
+
+ union all
+
+ --Find the avarage selling price
+ select 'avarage price' as measure_name,avg(price)  from gold.fact_sales
+
+  union all
+
+ --find the total number of orders
+ select 'number of orders' as measure_name, count( distinct order_number)  from gold.fact_sales
+
+  union all
+
+--find the total number of products
+select 'number of products' as measure_name,count(prodct_name)  from gold.dim_products 
+
+ union all
+
+--find the total number of customers 
+select'number of customers' as measure_name, count(customer_key) from gold.dim_customers
+
+ union all
+
+-- find the total number of customer that has placed an order
+select 'customers that placed order' as measure_name, count(distinct customer_key)  from gold.dim_customers
