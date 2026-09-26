@@ -1,0 +1,42 @@
+/*
+=====================================================================================
+Product Performance Analysis
+=====================================================================================
+
+Script Purpose:
+    - Analyze product sales performance across different years.
+    - Compare each product's yearly sales against its historical average.
+    - Compare current-year sales with the previous year's sales.
+    - Calculate sales differences using SQL window functions.
+    - Identify whether product performance increased, decreased, or remained unchanged.
+=====================================================================================
+*/
+with yearly_product_sales as (
+ select
+year(f.order_date) order_year,
+p.prodct_name,
+sum(f.sales_amount) current_sales
+from gold.fact_sales f
+left join  gold.dim_products p
+on f.product_key=p.product_key
+where order_date is not null
+group by year(f.order_date), p.prodct_name
+)
+select 
+order_year,
+prodct_name,
+current_sales,
+avg(current_sales) over(partition by prodct_name) avg_sales,
+current_sales-avg(current_sales) over(partition by prodct_name) as diff_avg,
+case when current_sales-avg(current_sales) over(partition by prodct_name)  > 0 then 'Above avg'
+     when current_sales-avg(current_sales) over(partition by prodct_name)  < 0 then 'Below avg'
+     else 'Avg'
+     end avg_chage,
+coalesce(lag(current_sales) over(partition by prodct_name order by order_year),'-') previous_year_sales ,
+coalesce(current_sales -lag(current_sales) over(partition by prodct_name order by order_year),0) as sales_diff,
+  case when current_sales -lag(current_sales) over(partition by prodct_name order by order_year) < 0 then 'Decrease'
+       when current_sales -lag(current_sales) over(partition by prodct_name order by order_year) >0 then 'Increase'
+       else 'No Change'
+       end previous_year_change
+from yearly_product_sales
+order by prodct_name, order_year
