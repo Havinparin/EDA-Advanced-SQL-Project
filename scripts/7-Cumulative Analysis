@@ -1,0 +1,27 @@
+/*
+=====================================================================================
+Cumulative Analysis
+=====================================================================================
+
+Script Purpose:
+    - Analyze cumulative sales performance over time.
+    - Calculate running total sales using SQL window functions.
+    - Calculate the moving average of selling prices.
+    - Demonstrate the use of window functions for trend and cumulative analysis.
+=====================================================================================
+*/
+select
+order_date,
+total_sales,
+sum(total_sales) over(order by order_date) as running_totals,
+avg(avarage_price) over (order by order_date) as moving_avarage
+from
+(
+select
+sum(sales_amount) as total_sales,
+datetrunc(year,order_date) as order_date,
+avg(price) avarage_price
+from gold.fact_sales 
+where order_date is not null
+group by datetrunc(year,order_date)
+)t
