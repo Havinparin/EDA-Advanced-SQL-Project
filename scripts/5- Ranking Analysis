@@ -1,0 +1,45 @@
+/*
+=====================================================================================
+Ranking Analysis
+=====================================================================================
+
+Script Purpose:
+    - Rank products based on their generated revenue.
+    - Identify the top-performing products by total sales.
+    - Identify lower-performing products based on revenue.
+    - Demonstrate the use of ranking techniques for product performance analysis.
+=====================================================================================
+*/
+
+-- Which products generate the higest revenue?
+ select top 5
+ product_key,
+ sum(sales_amount) as revenue
+ from gold.fact_sales
+ group by product_key
+ order by sum(sales_amount) desc
+
+-- which products are worst in performing in terms of sales?
+ select 
+ product_key,
+ sum(sales_amount) as revenue,
+ row_number() over(order by sum(sales_amount) asc) as rank_products
+ from gold.fact_sales
+ group by product_key
+ order by sum(sales_amount) 
+
+ -- Find the top 10 Customers who have generated the highest revenue?
+ select top 10
+ f.customer_key,
+ c.first_name,
+c.last_name,
+sum(f.sales_amount) as total_revenue
+from gold.fact_sales f
+left join gold.dim_customers c
+on f.customer_key=f.customer_key
+group by 
+ f.customer_key,
+ c.first_name,
+c.last_name
+order by total_revenue
+
